@@ -95,22 +95,22 @@ export default new SlashClass({
       );
 
       try {
-      const userData = await fetch(
-        `https://japi.rest/discord/v1/user/${user.id}`
-      );
-      const { data } = await userData?.json();
-
-      if (data?.public_flags_array) {
-        await Promise.all(
-          data?.public_flags_array.map(async (badge: String) => {
-            if (badge === "NITRO") badges.push(Badges.Nitro);
-          })
+        const userData = await fetch(
+          `https://japi.rest/discord/v1/user/${user.id}`
         );
-      }
+        const { data } = await userData?.json();
 
-    } catch (err) {
-      console.log('japi api went down when trying to check this user')
-    }
+        if (data?.public_flags_array) {
+          await Promise.all(
+            data?.public_flags_array.map(async (badge: String) => {
+              if (badge === "NITRO") badges.push(Badges.Nitro);
+            })
+          );
+        }
+
+      } catch (err) {
+        console.log('japi api went down when trying to check this user')
+      }
       if (user.bot) {
         const botFetch = await fetch(
           `https://discord.com/api/v10/applications/${user.id}/rpc`
@@ -147,21 +147,21 @@ export default new SlashClass({
         const entries = Object.entries(devices)
           .map((value) => {
             if (value[0] === 'desktop') {
-              return `\n${Emojis.Blank}${value[0].charAt(0).toUpperCase() + 
+              return `\n${Emojis.Blank}${value[0].charAt(0).toUpperCase() +
                 value[0].slice(1)}: ${Emojis.Check}`
             }
             if (value[0] === 'mobile') {
-              return `\n${Emojis.Blank}${value[0].charAt(0).toUpperCase() + 
+              return `\n${Emojis.Blank}${value[0].charAt(0).toUpperCase() +
                 value[0].slice(1)}: ${Emojis.Check}`
             }
             if (value[0] === 'web') {
-              return `\n${Emojis.Blank}${value[0].charAt(0).toUpperCase() + 
+              return `\n${Emojis.Blank}${value[0].charAt(0).toUpperCase() +
                 value[0].slice(1)}: ${Emojis.Check}`
             }
           }
           ).join(' ')
         return `${entries || Emojis.Cross}`
-     }
+      }
       if (member) {
         if (user.bot) {
           const botEmbed = new EmbedBuilder()
@@ -170,98 +170,98 @@ export default new SlashClass({
             .addFields([{
               name: "General",
               value: "\nBadges:" +
-                ` ${badges.join(" ") || Emojis.Cross}` + 
-                "\nVerified:" + 
+                ` ${badges.join(" ") || Emojis.Cross}` +
+                "\nVerified:" +
                 ` ${user.flags.has('VerifiedBot') ? `${Badges.VerifiedBot}` : `${Emojis.Cross}`}`
             }]);
 
 
           int.reply({ embeds: [botEmbed], ephemeral: true })
         }
-          let bot: Boolean | String;
-          if (member.user.bot) {
-            bot = Emojis.Check;
-          } else {
-            bot = Emojis.Cross;
-          }
-          let status = {
-            online: "Online",
-            idle: "Idle",
-            dnd: "Do Not Disturb",
-            offline: "Invisible",
-          };
-          let mode = {
-            online: Emojis.Online,
-            idle: Emojis.Idle,
-            dnd: Emojis.Dnd,
-            offline: Emojis.Offline,
-          };
+        let bot: Boolean | String;
+        if (member.user.bot) {
+          bot = Emojis.Check;
+        } else {
+          bot = Emojis.Cross;
+        }
+        let status = {
+          online: "Online",
+          idle: "Idle",
+          dnd: "Do Not Disturb",
+          offline: "Invisible",
+        };
+        let mode = {
+          online: Emojis.Online,
+          idle: Emojis.Idle,
+          dnd: Emojis.Dnd,
+          offline: Emojis.Offline,
+        };
 
-          const memberEmbed = new EmbedBuilder()
-              .setTitle('testing')
-            .setDescription(`> ${Emojis.Information} **Member Information**`)
-            .setThumbnail(member.displayAvatarURL({ extension: "png" }))
-            .addFields([
-              {
-                name: "General:",
-                value:
-                  `\n${Emojis.Profile} Profile:` +
-                  ` \`\`${member.user.username}\`\`
+        const memberEmbed = new EmbedBuilder()
+          .setTitle('testing')
+          .setDescription(`> ${Emojis.Information} **Member Information**`)
+          .setThumbnail(member.displayAvatarURL({ extension: "png" }))
+          .addFields([
+            {
+              name: "General:",
+              value:
+                `\n${Emojis.Profile} Profile:` +
+                ` \`\`${member.user.username}\`\`
                   ${Emojis.Blank} ${Emojis.RightArrow} Badges: ${badges.join(" ") || Emojis.Cross}
                   ${Emojis.Blank} ${Emojis.RightArrow} ID: ${member.id}
                   ${Emojis.Blank} ${Emojis.RightArrow} Status: ${mode[member.presence?.status ?? "offline"]} ${status[member.presence?.status ?? "offline"]
-                }` + 
-                  "\nCreated:" +
-                  ` <t:${Math.floor(user.createdAt.getTime() / 1000)}:D>` +
-                  "\nNickname:" +
-                  ` ${member.nickname ?? Emojis.Cross}` +
-                  "\nStreaming:" +
-                  ` ${member.presence?.activities?.filter(
-                    (item) => item.name === "YouTube" || item.name === "Twitch"
-                  ).length > 0
-                    ? member.presence?.activities
-                      .filter(
-                        (item) =>
-                          item.name === "YouTube" || item.name === "Twitch"
-                      )
-                      .map((activity) => {
-                        if (activity.type === ActivityType.Streaming) {
-                          return ` ${Emojis.Check}`;
-                        }
-                      })
-                    : ` ${Emojis.Cross}`
-                  }` +
-                  "\nBot:" +
-                  ` ${bot}` +
-                  "\nDevices:" +
-                  ` ${device()}` +
-                  "\nAvatar:" + 
-                  ` [png](${member.displayAvatarURL({ extension: 'png'} )}) • [jpg](${member.displayAvatarURL({ extension: 'jpg'} )})`,
-              },
-              {
-                name: "Roles:",
-                value: `Work in Progress`,
-              },
-              {
-                name: "Presence:",
-                value: codeBlock(
-                  "ini",
-                  `${member.presence?.activities
-                    .filter((item) => item.name != "Custom Status")
-                    .map((activity) => `[${activity.name}]`)
-                    .join("\n") || "No activities"
-                  }`
-                ),
-              },
-            ])
-            .setColor(Colors.Normal)
-            .setFooter({
-              text: `${member.user.username} `,
-              iconURL: member.user.avatarURL({ extension: "png" }),
-            })
-            .setTimestamp();
-          int.reply({ embeds: [memberEmbed], ephemeral: false });
-        
+                }` +
+                "\nCreated:" +
+                ` <t:${Math.floor(user.createdAt.getTime() / 1000)}:D>` +
+                "\nNickname:" +
+                ` ${member.nickname ?? Emojis.Cross}` +
+                "\nStreaming:" +
+                ` ${member.presence?.activities?.filter(
+                  (item) => item.name === "YouTube" || item.name === "Twitch"
+                ).length > 0
+                  ? member.presence?.activities
+                    .filter(
+                      (item) =>
+                        item.name === "YouTube" || item.name === "Twitch"
+                    )
+                    .map((activity) => {
+                      if (activity.type === ActivityType.Streaming) {
+                        return ` ${Emojis.Check}`;
+                      }
+                    })
+                  : ` ${Emojis.Cross}`
+                }` +
+                "\nBot:" +
+                ` ${bot}` +
+                "\nDevices:" +
+                ` ${device()}` +
+                "\nAvatar:" +
+                ` [png](${member.displayAvatarURL({ extension: 'png' })}) • [jpg](${member.displayAvatarURL({ extension: 'jpg' })})`,
+            },
+            {
+              name: "Roles:",
+              value: `Work in Progress`,
+            },
+            {
+              name: "Presence:",
+              value: codeBlock(
+                "ini",
+                `${member.presence?.activities
+                  .filter((item) => item.name != "Custom Status")
+                  .map((activity) => `[${activity.name}]`)
+                  .join("\n") || "No activities"
+                }`
+              ),
+            },
+          ])
+          .setColor(Colors.Normal)
+          .setFooter({
+            text: `${member.user.username} `,
+            iconURL: member.user.avatarURL({ extension: "png" }),
+          })
+          .setTimestamp();
+        int.reply({ embeds: [memberEmbed], ephemeral: false });
+
       } else {
         // if user isn't a guild member and just a USER
         const embed = new EmbedBuilder()

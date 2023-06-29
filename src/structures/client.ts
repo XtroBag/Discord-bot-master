@@ -16,9 +16,9 @@ export class ExtendedClient extends Client {
         super({
             intents: [
                 GatewayIntentBits.Guilds,
-                GatewayIntentBits.GuildPresences,
-                GatewayIntentBits.GuildMembers,
-                GatewayIntentBits.MessageContent,
+                // GatewayIntentBits.GuildPresences,
+                // GatewayIntentBits.GuildMembers,
+                // GatewayIntentBits.MessageContent,
                 GatewayIntentBits.GuildMessages,
                 GatewayIntentBits.GuildVoiceStates
             ],

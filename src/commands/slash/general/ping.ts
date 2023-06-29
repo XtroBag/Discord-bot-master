@@ -16,6 +16,7 @@ export default new SlashClass({
         guildOnly: false,
     },
     execute: async (_client, int: ChatInputCommandInteraction<'cached'>) => {
+
         const msg = await int.reply({
             content: 'Pinging...',
             fetchReply: true
