@@ -1,10 +1,15 @@
+interface CalloutLocation {
+    x: string,
+    y: string,
+}
+
 interface Callout {
     regionName: string,
     superRegionName: string,
-    location: object // updated this later
+    location: CalloutLocation
 }
 
-interface C extends Array<Callout>{}
+interface CalloutArray extends Array<Callout>{}
 
 export interface ValorantMapResponse {
     uuid: string,
@@ -19,6 +24,6 @@ export interface ValorantMapResponse {
     yMultiplier: number,
     xScalarToAdd: number,
     yScalarToAdd: number,
-    callouts: C
+    callouts: CalloutArray
 
 }
