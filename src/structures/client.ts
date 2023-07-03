@@ -7,27 +7,24 @@ import { client } from '../index.js';
 import fs from 'node:fs';
 import path from 'node:path';
 
-
 const dynamicImport = (path: string) => import(pathToFileURL(path).toString()).then((module) => module?.default);
 
 export class ExtendedClient extends Client {
-
     constructor() {
         super({
             intents: [
                 GatewayIntentBits.Guilds,
+                GatewayIntentBits.GuildMessages
                 // GatewayIntentBits.GuildPresences,
                 // GatewayIntentBits.GuildMembers,
                 // GatewayIntentBits.MessageContent,
-                GatewayIntentBits.GuildMessages,
-                GatewayIntentBits.GuildVoiceStates
             ],
             failIfNotExists: false,
             rest: {
                 retries: 3,
                 timeout: 15_000,
                 version: '10'
-            }
+            },
         });
         this.slash = new Collection<string, SlashClass>();
         this.cooldown = new Collection<string, Collection<string, number>>();

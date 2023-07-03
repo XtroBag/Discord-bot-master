@@ -40,8 +40,8 @@ export default new SlashClass({
             description: 'block a certain message in the server',
             type: ApplicationCommandOptionType.Subcommand,
             options: [{
-                name: 'word',
-                description: 'the word you want to block int he server',
+                name: 'words',
+                description: 'enter words in a order like: word, word, word',
                 type: ApplicationCommandOptionType.String,
                 required: true
             }]
@@ -56,17 +56,18 @@ export default new SlashClass({
     },
     execute: async (_client, int: ChatInputCommandInteraction<'cached'>) => {
         const sub = int.options.getSubcommand();
+        const words = int.options.getString('word');
+
+        const rules = await int.guild.autoModerationRules.fetch({ cache: true })
 
         switch (sub) {
             case 'flagged-words':
-                const rules = await int.guild.autoModerationRules.fetch({ cache: true })
-
-                if (rules.find((rule) => rule.triggerType === AutoModerationRuleTriggerType.KeywordPreset)) {
+                if (rules.find((rule) => rule.triggerType === AutoModerationRuleTriggerType.KeywordPreset) && rules.size > 1) {
                     return await int.reply({ embeds: [new EmbedBuilder().setColor(Colors.Normal).setDescription(`${Emojis.Cross} This rule already exists`)] })
                 }
 
                 await int.guild.autoModerationRules.create({
-                    name: 'block a given keyword in a msg',
+                    name: 'Blocks all types of bad message content',
                     triggerType: AutoModerationRuleTriggerType.KeywordPreset,
                     eventType: AutoModerationRuleEventType.MessageSend,
                     enabled: true,
@@ -82,7 +83,7 @@ export default new SlashClass({
                         }
                     }],
 
-                }).catch(async () => {})
+                }).catch(async () => { })
 
                 const embed = new EmbedBuilder()
                     .setColor(Colors.Normal)
@@ -91,13 +92,60 @@ export default new SlashClass({
                 await int.reply({ embeds: [embed] })
 
                 break;
-            case 'spam-messages':
-                console.log(sub)
+            case 'keywords':
+
+
+
+
+
+
+
+                if (rules.find((rule) => rule.triggerType === AutoModerationRuleTriggerType.Keyword) && rules.size > 6) {
+                    return await int.reply({ embeds: [new EmbedBuilder().setColor(Colors.Normal).setDescription(`${Emojis.Cross} Cannot have more then 6 of this rule`)] })
+                }
+
+                // const str = words.toString()
+
+                if (words.indexOf(',') > -1) {
+                    const checkedWords = words.split(',');
+                    console.log(checkedWords)
+
+                    return checkedWords;
+                }
+
+                // function checkedWords() {
+                //     words.indexOf(',') > -1
+                //     const checkedWords = words.split(',');
+                //     console.log(checkedWords)
+
+                //     return checkedWords;
+                // }
+
+
+                await int.guild.autoModerationRules.create({
+                    name: 'Blocks certain set words/phrases set by admins',
+                    triggerType: AutoModerationRuleTriggerType.Keyword,
+                    eventType: AutoModerationRuleEventType.MessageSend,
+                    enabled: true,
+                    triggerMetadata: {
+                        keywordFilter: []
+                    },
+                    actions: [{
+                        type: AutoModerationActionType.BlockMessage,
+                        metadata: {
+                            channel: int.channelId,
+                            customMessage: 'You said something that is not allowed!',
+                            durationSeconds: 10
+                        }
+                    }]
+                })
+
+
                 break;
             case 'mention-spam':
                 console.log(sub)
                 break;
-            case 'keyword':
+            case 'spam-messages':
                 console.log(sub)
                 break;
         }
