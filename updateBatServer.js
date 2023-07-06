@@ -1,6 +1,4 @@
-const config = require('./config.json');
-const Nodeactyl = require('nodeactyl');
-const colors = require('colors');
+import Nodeactyl from 'nodeactyl';
 const nodeactyl = new Nodeactyl.NodeactylClient("https://control.sparkedhost.us", '748c5454');
 
 (async () => {
