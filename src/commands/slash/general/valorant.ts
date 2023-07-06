@@ -6,7 +6,7 @@ import {
 } from "discord.js";
 import { SlashClass } from "../../../structures/slash.js";
 import { Colors } from "../../../../config.js";
-import { ValorantMapResponse } from "../../../typings/valotypes.js";
+import { ValorantMapResponse } from "../../../typings/valorant.js";
 
 export default new SlashClass({
   data: {
@@ -31,17 +31,24 @@ export default new SlashClass({
     guildOnly: false,
   },
   auto: async (int) => {
+    const value = int.options.getFocused()
     const data = await fetch("https://valorant-api.com/v1/maps");
     const response = await data.json();
 
     const choices = response.data;
 
-    await int.respond(
-      choices.map((choice) => ({
-        name: choice.displayName,
-        value: choice.uuid,
-      }))
-    );
+    const filtered = choices.filter((choice: ValorantMapResponse) => {
+      return choice.displayName.startsWith(value)
+     })
+
+     console.log(filtered)
+
+    // await int.respond(
+    //   filtered.map((choice: ValorantMapResponse) => ({
+    //     name: choice.displayName,
+    //     value: choice.uuid,
+    //   }))
+    // );
   },
 
   execute: async (_client, int: ChatInputCommandInteraction<"cached">) => {
@@ -59,15 +66,20 @@ export default new SlashClass({
       .addFields([
         {
           name: "Coordinates:",
-          value: `${map.coordinates ?? "n/a"}`,
+          value: `${map.coordinates ?? "None"}`,
         },
         {
           name: "Callouts:",
           value: `${map.callouts
-            .map(
-              (callout) => `[${callout.superRegionName}] ${callout.regionName}`
+            .map((callout, index) =>  {
+              return `\`\`${callout.superRegionName} 》\`\` **${callout.regionName}**${(index + 1) % 2 === 0 ? "\n" : ""}`
+            }
             )
-            .join(", ")}`,
+            .join(" ")
+            .split("\n")
+            .join("\n")
+          }`,
+          inline: true
         },
       ])
       .setColor(Colors.Normal);

@@ -73,5 +73,6 @@ export default new EventClass({
         )
       )
       .catch((e) => console.log(e));
+
   },
 });
