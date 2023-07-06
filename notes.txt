@@ -1,1 +1,0 @@
-Maybe make custom permissions system that works off discord's permisisons
