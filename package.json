@@ -6,10 +6,9 @@
   "types": "environment.d.ts",
   "scripts": {
     "start:prod": "node dist/src/index.js",
-    "server": "node dist/src/nodeactly/connect.js",
     "clean": "rimraf dist",
     "build": "tsc",
-    "start": "npm run build && npm run server && npm run start:prod",
+    "start": "npm run build && npm run start:prod",
     "deploy": "npm run build && node dist/src/deploy-commands.js"
   },
   "keywords": [
