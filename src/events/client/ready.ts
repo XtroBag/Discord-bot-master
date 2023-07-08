@@ -22,14 +22,14 @@ export default new EventClass({
 
     let options: OptionsEntry[] = [
       {
-        name: "TypeScript",
+        name: "TypeScript 🎭",
         type: ActivityType.Listening,
         status: "online",
       },
-      {
-        name: "XtroBag",
-        type: ActivityType.Watching,
-        status: "idle",
+      { 
+        name: "with Potions 🧪",
+        type: ActivityType.Playing,
+        status: 'online'
       },
     ];
 

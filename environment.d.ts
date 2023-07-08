@@ -9,6 +9,8 @@ declare global {
             CLIENT_ID: string;
             GUILD_ID: string;
             URI: string;
+            NodeactylAPIKey: string;
+            NodeactylServerId: string;
         }
     }
 }

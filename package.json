@@ -5,23 +5,13 @@
   "main": "dist/index.js",
   "types": "environment.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start:prod": "node dist/src/index.js",
+    "server": "node dist/src/nodeactly/connect.js",
     "clean": "rimraf dist",
-    "prebuild": "npm run clean",
     "build": "tsc",
-    "watch": "tsc -w",
-    "start": "npm run build && npm run start:prod",
+    "start": "npm run build && npm run server && npm run start:prod",
     "deploy": "npm run build && node dist/src/deploy-commands.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/joeyk710/sample-discordjs-bot.git"
-  },
-  "bugs": {
-    "url": "https://github.com/joeyk710/sample-discordjs-bot/issues"
-  },
-  "homepage": "https://github.com/joeyk710/sample-discordjs-bot#readme",
   "keywords": [
     "discordjs",
     "discord-bot",
