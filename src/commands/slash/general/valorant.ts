@@ -41,14 +41,12 @@ export default new SlashClass({
       return choice.displayName.startsWith(value)
      })
 
-     console.log(filtered)
-
-    // await int.respond(
-    //   filtered.map((choice: ValorantMapResponse) => ({
-    //     name: choice.displayName,
-    //     value: choice.uuid,
-    //   }))
-    // );
+    await int.respond(
+      filtered.map((choice: ValorantMapResponse) => ({
+        name: choice.displayName,
+        value: choice.uuid,
+      }))
+    );
   },
 
   execute: async (_client, int: ChatInputCommandInteraction<"cached">) => {
@@ -72,7 +70,7 @@ export default new SlashClass({
           name: "Callouts:",
           value: `${map.callouts
             .map((callout, index) =>  {
-              return `\`\`${callout.superRegionName} 》\`\` **${callout.regionName}**${(index + 1) % 2 === 0 ? "\n" : ""}`
+              return `\`\`${callout.superRegionName} \`\` **${callout.regionName}**${(index + 1) % 2 === 0 ? "\n" : ""}`
             }
             )
             .join(" ")
