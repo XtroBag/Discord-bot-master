@@ -9,7 +9,8 @@
     "clean": "rimraf dist",
     "build": "tsc",
     "start": "npm run build && npm run start:prod",
-    "deploy": "npm run build && node dist/src/deploy-commands.js"
+    "deploy": "npm run build && node dist/src/deploy-commands.js",
+    "nodeactly": "node dist/src/nodeactly/connect.js"
   },
   "keywords": [
     "discordjs",

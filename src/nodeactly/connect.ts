@@ -1,27 +1,24 @@
-import Nodeactyl from "nodeactyl";
+import { NodeactylClient } from "nodeactyl";
 
 async function NodeactylConnect(
   host: string,
   apikey: string,
   serverid: string
 ) {
-  const nodeactyl = new Nodeactyl.NodeactylClient(host, apikey);
+  const nodeactyl = new NodeactylClient(host, apikey);
   const status = await nodeactyl.getServerStatus(serverid);
   
   if (status === "running") {
-    nodeactyl.killServer(serverid).then(() => {
-      console.log(
-        "[Pterodactyl]",
-        "Killed Pterodactyl Server! Now starting it!"
-      );
+    try {
+    await nodeactyl.stopServer(serverid).catch()
+    } catch (err) {
+      console.log(err)
+    }
+  //  await nodeactyl.startServer(serverid).catch(err => console.log(err))
 
-      nodeactyl.startServer(serverid).then(() => {
-        console.log("[Pterodactyl]", "Started Pterodactyl Server!");
-      });
-    });
   }
   if (status === "offline") {
-    nodeactyl.startServer(serverid).then(() => {
+    await nodeactyl.startServer(serverid).then(() => {
       console.log("[Pterodactyl]", "Started Pterodactyl Server!");
     });
   }
