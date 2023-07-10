@@ -6,7 +6,7 @@ import {
   codeBlock,
 } from "discord.js";
 import { SlashClass } from "../../../structures/slash.js";
-import { Badges, Emojis, Colors } from "../../../../config.js";
+import { BadgeEmojis, Emojis, Colors } from "../../../../config.js";
 
 export default new SlashClass({
   data: {
@@ -52,40 +52,40 @@ export default new SlashClass({
         flags.map((badge) => {
           switch (badge) {
             case "Staff":
-              badges.push(Badges.Staff);
+              badges.push(BadgeEmojis.Staff);
               break;
             case "Partner":
-              badges.push(Badges.PartneredServer);
+              badges.push(BadgeEmojis.PartneredServer);
               break;
             case "CertifiedModerator":
-              badges.push(Badges.ModeratorProgramsAlumni);
+              badges.push(BadgeEmojis.ModeratorProgramsAlumni);
               break;
             case "Hypesquad":
-              badges.push(Badges.HypeSquadEvents);
+              badges.push(BadgeEmojis.HypeSquadEvents);
               break;
             case "HypeSquadOnlineHouse1":
-              badges.push(Badges.HypeSquadBravery);
+              badges.push(BadgeEmojis.HypeSquadBravery);
               break;
             case "HypeSquadOnlineHouse2":
-              badges.push(Badges.HypeSquadBrilliance);
+              badges.push(BadgeEmojis.HypeSquadBrilliance);
               break;
             case "HypeSquadOnlineHouse3":
-              badges.push(Badges.HypeSquadBalance);
+              badges.push(BadgeEmojis.HypeSquadBalance);
               break;
             case "BugHunterLevel1":
-              badges.push(Badges.BugHunter1);
+              badges.push(BadgeEmojis.BugHunter1);
               break;
             case "BugHunterLevel2":
-              badges.push(Badges.BugHunter2);
+              badges.push(BadgeEmojis.BugHunter2);
               break;
             case "ActiveDeveloper":
-              badges.push(Badges.ActiveDeveloper);
+              badges.push(BadgeEmojis.ActiveDeveloper);
               break;
             case "VerifiedDeveloper":
-              badges.push(Badges.VerifiedDeveloper);
+              badges.push(BadgeEmojis.VerifiedDeveloper);
               break;
             case "PremiumEarlySupporter":
-              badges.push(Badges.EarlySupporter);
+              badges.push(BadgeEmojis.EarlySupporter);
               break;
           }
         })
@@ -100,7 +100,7 @@ export default new SlashClass({
         if (data?.public_flags_array) {
           await Promise.all(
             data?.public_flags_array.map(async (badge: String) => {
-              if (badge === "NITRO") badges.push(Badges.Nitro);
+              if (badge === "NITRO") badges.push(BadgeEmojis.Nitro);
             })
           );
         }
@@ -113,7 +113,7 @@ export default new SlashClass({
         user.discriminator === "0" ||
         user.tag === `${user.username}#0`
       ) {
-        badges.push(Badges.Username);
+        badges.push(BadgeEmojis.Username);
       }
 
       const devices = member?.presence?.clientStatus || {};
@@ -162,12 +162,12 @@ export default new SlashClass({
       }
 
       if (arrayFlags.includes("APPLICATION_COMMAND_BADGE")) {
-        badges.push(Badges.SupportsCommands);
+        badges.push(BadgeEmojis.SupportsCommands);
       }
       if (
         arrayFlags.includes("APPLICATION_AUTO_MODERATION_RULE_CREATE_BADGE")
       ) {
-        badges.push(Badges.Automod);
+        badges.push(BadgeEmojis.Automod);
       }
 
       //-----------------------------------------------------------------------
@@ -187,7 +187,7 @@ export default new SlashClass({
                   "\nVerified:" +
                   ` ${
                     user?.flags.has("VerifiedBot")
-                      ? `${Badges.VerifiedBot}`
+                      ? `${BadgeEmojis.VerifiedBot}`
                       : `${Emojis.Cross}`
                   }`,
               },
