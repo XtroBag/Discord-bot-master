@@ -1,3 +1,3 @@
-# Cubed
+# Noxify
 
-![Cubed](src/photos/github/cubed.png)
+![Noxify](src/photos/github/Noxify.png)
