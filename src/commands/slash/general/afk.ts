@@ -24,10 +24,10 @@ export default new SlashClass({
     cooldown: 7,
     guildOnly: false,
   },
-  execute: async (_client, int: ChatInputCommandInteraction<'cached'>) => {
-    const data = await AFK.findOne({ afk: true, id: int.user.id });
+  execute: async (_client, interaction: ChatInputCommandInteraction<'cached'>) => {
+    const data = await AFK.findOne({ afk: true, id: interaction.user.id });
     if (data)
-      return await int.reply({
+      return await interaction.reply({
         embeds: [
           new EmbedBuilder()
             .addFields([
@@ -60,6 +60,6 @@ export default new SlashClass({
       ],
     });
 
-    await int.showModal(modal);
+    await interaction.showModal(modal);
   },
 });

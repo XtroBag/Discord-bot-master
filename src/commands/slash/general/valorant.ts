@@ -30,8 +30,8 @@ export default new SlashClass({
     cooldown: 5,
     guildOnly: false,
   },
-  auto: async (int) => {
-    const value = int.options.getFocused()
+  auto: async (autocomplete) => {
+    const value = autocomplete.options.getFocused()
     const data = await fetch("https://valorant-api.com/v1/maps");
     const response = await data.json();
 
@@ -41,7 +41,7 @@ export default new SlashClass({
       return choice.displayName.startsWith(value)
      })
 
-    await int.respond(
+    await autocomplete.respond(
       filtered.map((choice: ValorantMapResponse) => ({
         name: choice.displayName,
         value: choice.uuid,
@@ -49,8 +49,8 @@ export default new SlashClass({
     );
   },
 
-  execute: async (_client, int: ChatInputCommandInteraction<"cached">) => {
-    const uuid = int.options.getString("map");
+  execute: async (_client, interaction: ChatInputCommandInteraction<"cached">) => {
+    const uuid = interaction.options.getString("map");
 
     const mapCall = await fetch(`https://valorant-api.com/v1/maps/${uuid}`);
     const response = await mapCall.json();
@@ -82,6 +82,6 @@ export default new SlashClass({
       ])
       .setColor(Colors.Normal);
 
-    int.reply({ embeds: [embed] });
+    interaction.reply({ embeds: [embed] });
   },
 });

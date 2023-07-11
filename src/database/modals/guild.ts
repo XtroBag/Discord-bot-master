@@ -15,11 +15,18 @@ export interface GuildData {
   };
   applications: [
     {
-      name: string, // the channel name
-      channel: string,
+      name: string;
+      channel: string;
       questions?: [];
     }
-  ]
+  ],
+  welcome: {
+    channel: string;
+    prompt: string;
+    state: boolean;
+    roleIds: [];
+
+  }
 }
 
 export const Guild = model(
@@ -55,6 +62,21 @@ export const Guild = model(
         },
         questions: SchemaTypes.Array
       }
-    ]
+    ],
+    welcome: {
+      channel: {
+        type: SchemaTypes.String,
+        default: 'None',
+      },
+      prompt: {
+        type: SchemaTypes.String,
+        default: 'None'
+      },
+      state: {
+        type: SchemaTypes.Boolean,
+        default: false
+      },
+      roleIds: SchemaTypes.Array
+    }
   })
 );

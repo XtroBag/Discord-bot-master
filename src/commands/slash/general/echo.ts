@@ -13,15 +13,15 @@ export default new SlashClass({
         cooldown: 5,
         guildOnly: false,
     },
-    execute: async (_client, int: MessageContextMenuCommandInteraction<'cached'>) => {
+    execute: async (_client, interaction: MessageContextMenuCommandInteraction<'cached'>) => {
 
         // RE-VAMP THIS COMMAND TO BE BETTER AND NOT TAKE IN MENTIONS LIKE @EVERYONE AND MORE STUFF
-        const message = await int.targetMessage.fetch();
-        if (!message?.content) return int.reply({
+        const message = await interaction.targetMessage.fetch();
+        if (!message?.content) return interaction.reply({
             content: hyperlink('No content was found in this message!', message.url),
             ephemeral: true
         })
-        else return int.reply({
+        else return interaction.reply({
             content: hyperlink(message.content, message.url)
         });
     }

@@ -64,23 +64,23 @@ export default new SlashClass({
     },
 
 
-    auto: async (_int) => {
-        // const focused = int.options.getFocused() 
+    auto: async (_autocomplete) => {
+        // const focused = interaction.options.getFocused() 
 
     },
-    execute: async (_client, int: ChatInputCommandInteraction<'cached'>) => {
-        // const application = int.options.getString('application');
-        const name = int.options.getString('name');
+    execute: async (_client, interaction: ChatInputCommandInteraction<'cached'>) => {
+        // const application = interaction.options.getString('application');
+        const name = interaction.options.getString('name');
 
 
 
-        switch (int.options.getSubcommand()) {
+        switch (interaction.options.getSubcommand()) {
             case 'setup':
 
                 const SetupEmbed = new EmbedBuilder()
                     .setTitle("Application Setup")
                     .setDescription("This is the setup for a application system so users can apply\nfor staff or other things in your server.")
-                    .setFooter({ text: `Run by: ${int.user.username}` })
+                    .setFooter({ text: `Run by: ${interaction.user.username}` })
                     .setTimestamp()
 
                 const SetupButton = new ButtonBuilder()
@@ -88,12 +88,12 @@ export default new SlashClass({
                     .setLabel('Begin Setup')
                     .setStyle(ButtonStyle.Success)
 
-                const respond = await int.reply({ embeds: [SetupEmbed], components: [new ActionRowBuilder<ButtonBuilder>().addComponents(SetupButton)] })
+                const respond = await interaction.reply({ embeds: [SetupEmbed], components: [new ActionRowBuilder<ButtonBuilder>().addComponents(SetupButton)] })
 
                 const collector = respond.createMessageComponentCollector({ componentType: ComponentType.Button })
 
                 collector.on('collect', async (button) => {
-                    if (button.member.id !== int.member.id) {
+                    if (button.member.id !== interaction.member.id) {
                         await button.reply({ content: 'This button is not for you', ephemeral: true })
                     } else {
                         if (button.customId === 'beginSetup') {
@@ -109,12 +109,12 @@ export default new SlashClass({
                                 .setMinValues(1)
 
                             const data = await button.update({ embeds: [ChannelEmbed], components: [new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(SelectChannel)] })
-                            const Menu = await data.awaitMessageComponent({ filter: i => i.user.id === int.user.id, componentType: ComponentType.ChannelSelect })
+                            const Menu = await data.awaitMessageComponent({ filter: i => i.user.id === interaction.user.id, componentType: ComponentType.ChannelSelect })
 
                             const channel = Menu.values[0];
 
                             await Guild.findOneAndUpdate(
-                                { id: int.guild.id, guildName: int.guild.name },
+                                { id: interaction.guild.id, guildName: interaction.guild.name },
                                 { $push: { applications: { name: name, channel: channel } } })
                                 .then(async (doc) => await doc.save())
 
@@ -144,7 +144,7 @@ export default new SlashClass({
                             const MenuCollector = ButtonSelectMenu.createMessageComponentCollector({ componentType: ComponentType.Button })
 
                             MenuCollector.on('collect', async (button) => {
-                                if (button.member.id !== int.member.id) {
+                                if (button.member.id !== interaction.member.id) {
                                     await button.reply({ content: 'This button is not for you', ephemeral: true })
                                 } else {
                                     if (button.customId === 'add-question') {

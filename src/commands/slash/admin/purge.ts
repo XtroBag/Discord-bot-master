@@ -29,12 +29,12 @@ export default new SlashClass({
         cooldown: 3,
         guildOnly: false,
     },
-    execute: async (_client, int: ChatInputCommandInteraction<'cached'>) => {
-        const user = int.options.getMember("user");
-        const amount = int.options.getInteger("amount");
+    execute: async (_client, interaction: ChatInputCommandInteraction<'cached'>) => {
+        const user = interaction.options.getMember("user");
+        const amount = interaction.options.getInteger("amount");
 
-        const messages = await int.channel.messages.fetch({ limit: 100 });
-		await (int.channel as TextChannel).bulkDelete(messages.filter(msg => user ? msg.author.id === user.id : true).toJSON().slice(0, amount), true);
+        const messages = await interaction.channel.messages.fetch({ limit: 100 });
+		await (interaction.channel as TextChannel).bulkDelete(messages.filter(msg => user ? msg.author.id === user.id : true).toJSON().slice(0, amount), true);
 
     },
 });

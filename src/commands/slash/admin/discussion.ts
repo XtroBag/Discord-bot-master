@@ -36,8 +36,8 @@ export default new SlashClass({
     cooldown: 5,
     guildOnly: true,
   },
-  execute: async (_client, int: ChatInputCommandInteraction<'cached'>) => {
-    const choice = int.options.getString("choice");
+  execute: async (_client, interaction: ChatInputCommandInteraction<'cached'>) => {
+    const choice = interaction.options.getString("choice");
 
     switch (choice) {
       case "Set":
@@ -62,7 +62,7 @@ export default new SlashClass({
               .setMaxValues(1),
           ]);
 
-        int.reply({ embeds: [embed], components: [menu] });
+        interaction.reply({ embeds: [embed], components: [menu] });
 
         break;
 

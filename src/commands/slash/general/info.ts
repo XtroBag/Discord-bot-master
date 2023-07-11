@@ -40,10 +40,10 @@ export default new SlashClass({
     cooldown: 5,
     guildOnly: false,
   },
-  execute: async (_client, int: ChatInputCommandInteraction<"cached">) => {
-    const choice = int.options.getSubcommand();
-    const user = int.options.getUser("user");
-    const member = int.options.getMember("user");
+  execute: async (_client, interaction: ChatInputCommandInteraction<"cached">) => {
+    const choice = interaction.options.getSubcommand();
+    const user = interaction.options.getUser("user");
+    const member = interaction.options.getMember("user");
 
     if (choice === "user") {
       let flags = user?.flags.toArray();
@@ -194,7 +194,7 @@ export default new SlashClass({
             ])
             .setColor(Colors.Normal);
 
-          return await int.reply({ embeds: [botEmbed] });
+          return await interaction.reply({ embeds: [botEmbed] });
         }
       } catch (err) {
         console.log(err, "Had issue grabbing the bot information");
@@ -291,7 +291,7 @@ export default new SlashClass({
           })
           .setTimestamp();
 
-        return await int.reply({ embeds: [memberEmbed] });
+        return await interaction.reply({ embeds: [memberEmbed] });
       } else if (user) {
         const userEmbed = new EmbedBuilder()
           .setTitle("User Information")
@@ -302,7 +302,7 @@ export default new SlashClass({
               value: "\nBadges:" + ` ${badges.join(" ") || " None"}`,
             },
           ]);
-        return await int.reply({ embeds: [userEmbed] });
+        return await interaction.reply({ embeds: [userEmbed] });
       }
     }
 
@@ -313,11 +313,11 @@ export default new SlashClass({
           name: `> ${Emojis.Information} General`,
           value:
             "\nName:" +
-            ` ${int.guild.name}` +
+            ` ${interaction.guild.name}` +
             "\nDescription:" +
-            ` ${int.guild.description ?? Emojis.Cross}` +
+            ` ${interaction.guild.description ?? Emojis.Cross}` +
             "\nOwner:" +
-            ` ${int.guild.ownerId === int.member.id
+            ` ${interaction.guild.ownerId === interaction.member.id
               ? Emojis.Check
               : Emojis.Cross}` +
             "" +
@@ -335,7 +335,7 @@ export default new SlashClass({
           name: `> ${Emojis.Information} Stats`,
           value:
             "\nMembers:" +
-            ` ${int.guild.memberCount}` +  //code a way to put a start behind members too show it's eleagble to be partnered with that amount of members
+            ` ${interaction.guild.memberCount}` +  //code a way to put a start behind members too show it's eleagble to be partnered with that amount of members
             "" +
             `` +
             "" +
@@ -348,7 +348,7 @@ export default new SlashClass({
           value: "nothing yet"
         }
       ]).setColor(Colors.Information)
-      await int.reply({ embeds: [embed] });
+      await interaction.reply({ embeds: [embed] });
     }
   },
 });

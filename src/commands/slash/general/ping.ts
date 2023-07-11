@@ -15,16 +15,16 @@ export default new SlashClass({
         ownerOnly: false,
         guildOnly: false,
     },
-    execute: async (_client, int: ChatInputCommandInteraction<'cached'>) => {
+    execute: async (_client, interaction: ChatInputCommandInteraction<'cached'>) => {
 
-        const msg = await int.reply({
+        const msg = await interaction.reply({
             content: 'Pinging...',
             fetchReply: true
         }); 
         setTimeout(() => {
-            const ping = msg.createdTimestamp - int.createdTimestamp;
-            int.editReply({
-                content: `Pong! Latency is ${inlineCode(`${ping}ms`)}. \nAPI Latency is ${inlineCode(`${int.client.ws.ping}ms`)}`
+            const ping = msg.createdTimestamp - interaction.createdTimestamp;
+            interaction.editReply({
+                content: `Pong! Latency is ${inlineCode(`${ping}ms`)}. \nAPI Latency is ${inlineCode(`${interaction.client.ws.ping}ms`)}`
             });
         }, 3000);
     },

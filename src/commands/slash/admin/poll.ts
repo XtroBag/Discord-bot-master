@@ -35,9 +35,9 @@ import {
       cooldown: 3,
       guildOnly: false,
     },
-    execute: async (_client, int: ChatInputCommandInteraction<'cached'>) => {
-        const topic = int.options.getString('topic');
-        const channel = int.options.getChannel('channel');
+    execute: async (_client, interaction: ChatInputCommandInteraction<'cached'>) => {
+        const topic = interaction.options.getString('topic');
+        const channel = interaction.options.getChannel('channel');
 
         const embed = new EmbedBuilder()
         .setTitle(`${Emojis.Poll} Poll Began`)
@@ -45,7 +45,7 @@ import {
         .addFields([
           { name: 'upVotes', value: '> **No Votes**', inline: true },
           { name: 'downVotes', value: '> **No Votes**', inline: true },
-          { name: 'Author', value: `> ${int.user.username}`}
+          { name: 'Author', value: `> ${interaction.user.username}`}
         ])
         .setFooter({ text: 'Poll Started'})
         .setColor(Colors.Normal)
@@ -65,9 +65,9 @@ import {
 
          if (channel?.isTextBased()) {
          const sent = await channel.send({ embeds: [embed], components: [row] })
-          await int.reply({ content: `Sent poll too <#${sent.id}>`, ephemeral: true })
+          await interaction.reply({ content: `Sent poll too <#${sent.id}>`, ephemeral: true })
         } else {
-          await int.reply({ embeds: [embed], components: [row] })
+          await interaction.reply({ embeds: [embed], components: [row] })
         }
 
         

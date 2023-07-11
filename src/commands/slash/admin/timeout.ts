@@ -40,13 +40,13 @@ export default new SlashClass({
     cooldown: 3,
     guildOnly: false,
   },
-  execute: async (_client, int: ChatInputCommandInteraction<'cached'>) => {
-    const user = int.options.getMember("user");
-    const time = int.options.getString("time");
-    const reason = int.options.getString("reason");
+  execute: async (_client, interaction: ChatInputCommandInteraction<'cached'>) => {
+    const user = interaction.options.getMember("user");
+    const time = interaction.options.getString("time");
+    const reason = interaction.options.getString("reason");
 
     if (!user.moderatable || !user.manageable) {
-      return await int.reply({
+      return await interaction.reply({
         content: "This user can not be modified by the bot!",
       });
     }
@@ -54,7 +54,7 @@ export default new SlashClass({
     const length = ms(time);
 
     if (!length || length >  ms('28d')) {
-      return await int.reply({ content: 'Time is invalid or is over 28 day limit'})
+      return await interaction.reply({ content: 'Time is invalid or is over 28 day limit'})
     } 
 
     await user.timeout(ms(time), reason).catch((err) => {
@@ -66,7 +66,7 @@ export default new SlashClass({
     .setDescription(`${user.user.username}'s been timed out until <t:${Math.round((Date.now() + length) / 1000)}:f>`)
     .setTimestamp()
 
-   await int.reply({
+   await interaction.reply({
       embeds: [embed]
     });
   },

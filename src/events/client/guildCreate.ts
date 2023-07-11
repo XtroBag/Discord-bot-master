@@ -23,7 +23,13 @@ export default new EventClass({
               channel: 'None',
               active: false
             },
-            applications: []
+            applications: [],
+            welcome: {
+              channel: 'None',
+              prompt: 'None',
+              state: false,
+              roleIds: []
+            }
         }));
         console.log(chalk.green(`Successfully`) + chalk.white(` Added ${guild.name} too the guilds database!`))
   },

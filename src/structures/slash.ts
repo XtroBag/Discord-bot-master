@@ -13,8 +13,8 @@ interface CustomOptions {
 interface CommandOptions {
     data: ApplicationCommandData;
     opt: CustomOptions;
-    auto?: (int: AutocompleteInteraction) => Promise<any>;
-    execute: (client: ExtendedClient, int: any) => Promise<any>;
+    auto?: (autocomplete: AutocompleteInteraction) => Promise<any>;
+    execute: (client: ExtendedClient, interaction: any) => Promise<any>;
 };
 
 export class SlashClass {

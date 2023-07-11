@@ -43,13 +43,13 @@ export default new SlashClass({
     cooldown: 5,
     guildOnly: false,
   },
-  execute: async (client, int: ChatInputCommandInteraction<"cached">) => {
-    const badge = int.options.getString("check");
+  execute: async (client, interaction: ChatInputCommandInteraction<"cached">) => {
+    const badge = interaction.options.getString("check");
 
     if (badge) {
       let members = [];
 
-      int.guild.members.cache.forEach(async (member) => {
+      interaction.guild.members.cache.forEach(async (member) => {
         if (member.user.flags.toArray().includes(badge as UserFlagsString))
           members.push(member);
       });
@@ -68,10 +68,10 @@ export default new SlashClass({
         .setColor(Colors.Normal);
 
       try {
-        await int.reply({ embeds: [embed] });
+        await interaction.reply({ embeds: [embed] });
         console.log(members);
       } catch (e) {
-        return await int.reply({
+        return await interaction.reply({
           content: `Too many people with the **${badge}** to show`,
         });
       }
@@ -79,7 +79,7 @@ export default new SlashClass({
       let badges = [];
       let counts = {};
 
-      for (const member of int.guild.members.cache.values()) {
+      for (const member of interaction.guild.members.cache.values()) {
         const user = await client.users.fetch(member.user.id);
         badges = badges.concat(user.flags?.toArray());
 
@@ -141,9 +141,9 @@ export default new SlashClass({
         `
         )
         .setColor(Colors.Normal)
-        .setFooter({ text: `all badges for ${int.guild.name}` });
+        .setFooter({ text: `all badges for ${interaction.guild.name}` });
 
-     return await int.reply({ embeds: [embed] });
+     return await interaction.reply({ embeds: [embed] });
     }
   },
 });
