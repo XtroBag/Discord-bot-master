@@ -24,7 +24,7 @@ export interface GuildData {
     channel: string;
     prompt: string;
     state: boolean;
-    roleIds: [];
+    roleIds: string[];
 
   }
 }
