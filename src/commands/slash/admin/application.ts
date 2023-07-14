@@ -72,8 +72,6 @@ export default new SlashClass({
         // const application = interaction.options.getString('application');
         const name = interaction.options.getString('name');
 
-
-
         switch (interaction.options.getSubcommand()) {
             case 'setup':
 
