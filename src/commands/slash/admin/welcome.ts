@@ -53,212 +53,213 @@ export default new SlashClass({
 
       const enableReply = await interaction.reply({ components: [row] });
 
-      const collector = enableReply.createMessageComponentCollector();
+      const collector = enableReply.createMessageComponentCollector({
+        filter: ({ user }) => user.id === interaction.user.id,
+        dispose: true,
+      });
+
+      collector.on("ignore", (interaction) => {
+        interaction.reply({
+          content: `This interaction is not for you ${interaction.user.username}`,
+        });
+      });
 
       collector.on("collect", async (collected) => {
-          if (collected.customId === "Enable-Button") {
-            if (collected.member.id !== interaction.member.id) {
-             await collected.reply({ content: `[ENABLE BUTTON]: NOT FOR YOU [${collected.member.displayName}]`})
-            } else {
-              await Guild.findOneAndUpdate(
-                {
-                  id: interaction.guild.id,
-                },
-                {
-                  $set: {
-                    "welcome.state": true,
-                  },
-                }
-              );
-  
-              info.welcome.state = true; 
-  
-              row.components[0]
-                .setStyle(ButtonStyle.Success)
-                .setLabel("Enabled")
-                .setDisabled(true);
-  
-              row.components[1].setDisabled(false);
-  
-              await collected.update({ components: [row] });
-
+        if (collected.customId === "Enable-Button") {
+          await Guild.findOneAndUpdate(
+            {
+              id: interaction.guild.id,
+            },
+            {
+              $set: {
+                "welcome.state": true,
+              },
             }
-          }
+          );
 
-          if (collected.customId === "Start-Button") {
-            if (collected.member.id !== interaction.member.id) {
-              await collected.reply({ content: `[START BUTTON]: NOT FOR YOU [${collected.member.displayName}]` })
-            } else {
-              const channeSelectMenuRow =
-              new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
-                new ChannelSelectMenuBuilder()
-                  .setChannelTypes([ChannelType.GuildText])
-                  .setPlaceholder("Choose a welcome channel")
-                  .setMaxValues(1)
-                  .setMinValues(0)
-                  .setCustomId("Channel-Select")
-              );
+          info.welcome.state = true;
 
-            const channelSelectMenu = await collected.update({
-              components: [channeSelectMenuRow],
+          row.components[0]
+            .setStyle(ButtonStyle.Success)
+            .setLabel("Enabled")
+            .setDisabled(true);
+
+          row.components[1].setDisabled(false);
+
+          await collected.update({ components: [row] });
+        }
+
+        if (collected.customId === "Start-Button") {
+          const channeSelectMenuRow =
+            new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
+              new ChannelSelectMenuBuilder()
+                .setChannelTypes([ChannelType.GuildText])
+                .setPlaceholder("Choose a welcome channel")
+                .setMaxValues(1)
+                .setMinValues(0)
+                .setCustomId("Channel-Select")
+            );
+
+          const channelSelectMenu = await collected.update({
+            components: [channeSelectMenuRow],
+          });
+
+          const channelSelectMenuResponse =
+            await channelSelectMenu.awaitMessageComponent({
+              componentType: ComponentType.ChannelSelect,
+              filter: ({ user }) => user.id === interaction.user.id,
             });
 
-            const channelSelectMenuResponse =
-              await channelSelectMenu.awaitMessageComponent({
-                componentType: ComponentType.ChannelSelect,
-              });
-
-              // console.log('ChannelSeletMenuResponse:', channelSelectMenuResponse.member.id, channelSelectMenuResponse.member.displayName)
-              // console.log('CollectedMemberResponse:', collected.member.id, collected.member.displayName)
-              // console.log('InteractionMemberResponse:', interaction.member.id, interaction.member.displayName)
-
-
-              // CONTINUE FIXING THE CHECKS TO SEE IF SOMETHING DON'T BELONG TO ANOTHER USER
-              // REMINDER: It prob has something to do inside of the custom id statements since there is where the code
-              // is executed from
-
-            if (channelSelectMenuResponse.customId === "Channel-Select") {
-              if (channelSelectMenuResponse.member.id !== interaction.member.id) {
-                await collected.followUp({ content: `[CHANNEL MENU]: NOT FOR YOU [${collected.member.displayName}]`})
-              } else {
-                await Guild.findOneAndUpdate(
-                  {
-                    id: interaction.guild.id,
-                  },
-                  {
-                    $set: {
-                      "welcome.channel": channelSelectMenuResponse.values[0],
-                    },
-                  }
-                );
+          if (channelSelectMenuResponse.customId === "Channel-Select") {
+            await Guild.findOneAndUpdate(
+              {
+                id: interaction.guild.id,
+              },
+              {
+                $set: {
+                  "welcome.channel": channelSelectMenuResponse.values[0],
+                },
               }
-            }
+            );
+          }
 
+          // CHANNEL SELECT MENU COMPLETE HERE ---------------------------
 
-
-
-            // STOPPING AT THIS POINT FOR NOW
-
-            // CHANNEL SELECT MENU COMPLETE HERE ---------------------------
-
-            const embed = new EmbedBuilder()
-              .setTitle("Prepare prompt")
-              .setDescription(
-                "You will be setting a prompt to show new users joining"
-              )
-              .addFields([
-                {
-                  name: "Replacements:",
-                  value: `
+          const embed = new EmbedBuilder()
+            .setTitle("Prepare prompt")
+            .setDescription(
+              "You will be setting a prompt to show new users joining"
+            )
+            .addFields([
+              {
+                name: "Replacements:",
+                value: `
                   {member} - shows member name
                   {mention} - mentions the member
                   {server} - the server name
                   {membercount} - servers membercount
                   `,
-                },
-              ])
-              .setColor(Colors.Normal);
+              },
+            ])
+            .setColor(Colors.Normal);
 
-            const modalButton =
-              new ActionRowBuilder<ButtonBuilder>().addComponents(
-                new ButtonBuilder()
-                  .setLabel("Continue")
-                  .setStyle(ButtonStyle.Primary)
-                  .setCustomId("Start-Modal")
-              );
-
-            const modal = new ModalBuilder()
-              .setCustomId("Prompt-Modal")
-              .setTitle("Welcome Prompt");
-
-            const modalMessage = new TextInputBuilder()
-              .setCustomId("Welcome-Message")
-              .setLabel("What is ur welcome msg?")
-              .setStyle(TextInputStyle.Short)
-              .setRequired(true);
-
-            const modalComponent =
-              new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
-                modalMessage
-              );
-
-            modal.addComponents(modalComponent);
-
-            const buttonResponse = await channelSelectMenuResponse.update({
-              components: [modalButton],
-              embeds: [embed],
-            });
-
-            const modalBeginButton = await buttonResponse.awaitMessageComponent(
-              { componentType: ComponentType.Button }
+          const modalButton =
+            new ActionRowBuilder<ButtonBuilder>().addComponents(
+              new ButtonBuilder()
+                .setLabel("Continue")
+                .setStyle(ButtonStyle.Primary)
+                .setCustomId("Start-Modal")
             );
 
-            if (modalBeginButton.customId === "Start-Modal") {
-              await modalBeginButton.showModal(modal);
-            }
+          const modal = new ModalBuilder()
+            .setCustomId("Prompt-Modal")
+            .setTitle("Welcome Prompt");
 
-            const receivedModal = await modalBeginButton.awaitModalSubmit({
-              time: 120000,
-            });
+          const modalMessage = new TextInputBuilder()
+            .setCustomId("Welcome-Message")
+            .setLabel("What is ur welcome msg?")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true);
 
-            if (receivedModal.customId === "Prompt-Modal") {
-              const msg =
-                receivedModal.fields.getTextInputValue("Welcome-Message");
+          const modalComponent =
+            new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+              modalMessage
+            );
 
-              await Guild.findOneAndUpdate(
-                {
-                  id: interaction.guild.id,
+          modal.addComponents(modalComponent);
+
+          const buttonResponse = await channelSelectMenuResponse.update({
+            components: [modalButton],
+            embeds: [embed],
+          });
+
+          const modalBeginButton = await buttonResponse.awaitMessageComponent({
+            componentType: ComponentType.Button,
+            filter: ({ user }) => user.id === interaction.user.id,
+          });
+
+          if (modalBeginButton.customId === "Start-Modal") {
+            await modalBeginButton.showModal(modal);
+          }
+
+          const receivedModal = await modalBeginButton.awaitModalSubmit({
+            time: 120000,
+            filter: ({ user }) => user.id === interaction.user.id,
+          });
+
+          if (receivedModal.customId === "Prompt-Modal") {
+            const msg =
+              receivedModal.fields.getTextInputValue("Welcome-Message");
+
+            await Guild.findOneAndUpdate(
+              {
+                id: interaction.guild.id,
+              },
+              {
+                $set: {
+                  "welcome.prompt": msg,
                 },
-                {
-                  $set: {
-                    "welcome.prompt": msg,
-                  },
-                }
-              ).then(async () => {
-                await receivedModal.reply({
-                  content: "Message was submitted!",
-                  ephemeral: true,
-                });
+              }
+            ).then(async () => {
+              await receivedModal.reply({
+                content: "Message was submitted!",
+                ephemeral: true,
               });
-            }
+            });
+          }
 
-            // MESSAGE MODAL COMPLETE HERE ---------------------------
+          // MESSAGE MODAL COMPLETE HERE ---------------------------
 
-            const roleEmbed = new EmbedBuilder()
-              .setTitle("Select On Join Roles")
-              .setDescription("roles to give user when they join the server")
-              .setColor(Colors.Normal);
+          const roleEmbed = new EmbedBuilder()
+            .setTitle("Select On Join Roles")
+            .setDescription("roles to give user when they join the server")
+            .setColor(Colors.Normal);
 
-            const skipButton = new ButtonBuilder()
-              .setLabel("Skip")
-              .setStyle(ButtonStyle.Primary)
-              .setCustomId("Skip-Button");
+          const skipButton = new ButtonBuilder()
+            .setLabel("Skip")
+            .setStyle(ButtonStyle.Primary)
+            .setCustomId("Skip-Button");
 
-            const roleSkipButton =
-              new ActionRowBuilder<ButtonBuilder>().addComponents(skipButton);
+          const roleSkipButton =
+            new ActionRowBuilder<ButtonBuilder>().addComponents(skipButton);
 
-            const roleSelectMenu =
-              new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(
-                new RoleSelectMenuBuilder()
-                  .setCustomId("Role-Select")
-                  .setPlaceholder("Select some roles to give a new user")
-                  .setMaxValues(4)
-                  .setMinValues(0)
-              );
+          const roleSelectMenu =
+            new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(
+              new RoleSelectMenuBuilder()
+                .setCustomId("Role-Select")
+                .setPlaceholder("Select some roles to give a new user")
+                .setMaxValues(4)
+                .setMinValues(0)
+            );
 
-            const roleMenuComponents = await modalBeginButton.editReply({
-              components: [roleSelectMenu, roleSkipButton],
-              embeds: [roleEmbed],
+          const roleMenuComponents = await modalBeginButton.editReply({
+            components: [roleSelectMenu, roleSkipButton],
+            embeds: [roleEmbed],
+          });
+
+          const nextcollector =
+            roleMenuComponents.createMessageComponentCollector({
+              filter: ({ user }) => user.id === interaction.user.id,
             });
 
-            const collector =
-              roleMenuComponents.createMessageComponentCollector();
+          nextcollector.on("ignore", (interaction) => {
+            interaction.reply({
+              content: `This interaction is not for you ${interaction.user.username}`,
+            });
+          });
 
-            collector.on("collect", async (component) => {
-              if (component.isRoleSelectMenu()) {
-                const welsystem = await Guild.findOne(
-                  { id: interaction.guildId },
-                  {},
+          nextcollector.on("collect", async (component) => {
+            if (component.isRoleSelectMenu()) {
+              if (component.customId === "Role-Select") {
+                const welsystem = await Guild.findOneAndUpdate(
+                  {
+                    id: interaction.guildId,
+                  },
+                  {
+                    $set: {
+                      "welcome.roleIds": component.values,
+                    },
+                  },
                   { new: true }
                 );
 
@@ -269,7 +270,7 @@ export default new SlashClass({
                   )
                   .addFields([
                     {
-                      name: 'Selected Roles:',
+                      name: "Selected Roles:",
                       value: `${welsystem.welcome.roleIds
                         .map((id, idx) => {
                           return `\n${idx + 1} <@&${id}>`;
@@ -277,66 +278,45 @@ export default new SlashClass({
                         .join(" ")}`,
                     },
                     {
-                      name: 'Selected Channel:',
-                      value: `<#${welsystem.welcome.channel}>`
+                      name: "Selected Channel:",
+                      value: `<#${welsystem.welcome.channel}>`,
                     },
                     {
                       name: "Prompt:",
-                      value: `${welsystem.welcome.prompt}`
-                    }
+                      value: `${welsystem.welcome.prompt}`,
+                    },
                   ])
                   .setFooter({ text: "Completed Setup" })
                   .setTimestamp()
                   .setColor(Colors.Normal);
 
-                if (component.customId === "Role-Select") {
-                  await Guild.findOneAndUpdate(
-                    {
-                      id: interaction.guildId,
-                    },
-                    {
-                      $set: {
-                        "welcome.roleIds": component.values,
-                      },
-                    },
-                    { new: true }
-                  );
-
-                  await component.update({
-                    embeds: [embed],
-                    components: [],
-                  });
-                }
+                await component.update({
+                  embeds: [embed],
+                  components: [],
+                });
               }
-
-              if (component.isButton()) {
-                if (component.customId === "Skip-Button") {
-                  const embed = new EmbedBuilder()
-                    .setTitle("Finished Setup")
-                    .setDescription(
-                      "The system will now welcome new users who join the server"
-                    )
-                    .setFooter({ text: "Skipped role selection" })
-                    .setTimestamp()
-                    .setColor(Colors.Normal);
-
-                  roleMenuComponents.edit({
-                    embeds: [embed],
-                    components: [],
-                  });
-                }
-              }
-            });
-
             }
+
+            if (component.isButton()) {
+              if (component.customId === "Skip-Button") {
+                const embed = new EmbedBuilder()
+                  .setTitle("Finished Setup")
+                  .setDescription(
+                    "The system will now welcome new users who join the server"
+                  )
+                  .setFooter({ text: "Skipped role selection" })
+                  .setTimestamp()
+                  .setColor(Colors.Normal);
+
+                roleMenuComponents.edit({
+                  embeds: [embed],
+                  components: [],
+                });
+              }
+            }
+          });
         }
       });
-
-
-
-
-
-
     } else if (info.welcome.state === true) {
       // MAKE IT WHEN THE PERSON DISABLED THE SYSTEM PUTS BACK TO DEFAULT VALUES
       const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -349,33 +329,33 @@ export default new SlashClass({
       const disableReply = await interaction.reply({ components: [row] });
 
       const collector = disableReply.createMessageComponentCollector({
-        componentType: ComponentType.Button
+        componentType: ComponentType.Button,
+        filter: ({ user }) => user.id === interaction.user.id,
+      });
+
+      collector.on("ignore", (interaction) => {
+        interaction.reply({
+          content: `This interaction is not for you ${interaction.user.username}`,
+        });
       });
 
       collector.on("collect", async (button) => {
-        if (button.member.id !== interaction.member.id) {
-          await button.reply({
-            content: "[DISABLE SYSTEM]: These buttons are not for you",
-            ephemeral: true,
-          });
-        } else {
-          if (button.customId === "Disable-Button") {
-            await Guild.findOneAndUpdate(
-              {
-                id: interaction.guild.id,
+        if (button.customId === "Disable-Button") {
+          await Guild.findOneAndUpdate(
+            {
+              id: interaction.guild.id,
+            },
+            {
+              $set: {
+                "welcome.state": false,
               },
-              {
-                $set: {
-                  "welcome.state": false,
-                },
-              }
-            );
+            }
+          );
 
-            // make it here to when someone disables system everything goes to default
-          }
-
-          button.update({ content: "Disabled System", components: [] });
+          // make it here to when someone disables system everything goes to default
         }
+
+        button.update({ content: "Disabled System", components: [] });
       });
     }
   },
